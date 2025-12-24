@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DIINO2D</title>
+    <meta name="author" content="Zengl">
+    <meta name="description" content="Game - DINO2D">
+    <link rel="icon" href="./Animations/Menu/logotip.png" type="image/png">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main>
+      <div id="window">
+        <img src="./Animations/Window/homeWindow.gif" id="game">
+        
+        
+        <!--global-->
+        <div id="screen_home">
+          <div id="nameGame">Dino 2d</div>
+          <hr id="hrTop">
+          <div id="menu">
+            <img src="./Animations/Menu/settings.png" class="menu_tag" id="menu_settings">
+            <img src="./Animations/Menu/start.png" class="menu_tag" id="menu_start">
+            <img src="./Animations/Menu/shop.png" class="menu_tag" id="menu_shop">
+          </div>
+          <hr id="hrBottom">
+          <div id="details">
+            <span>version: 1.1.1</span>
+          </div>
+        </div>
+        
+        <!-- settings -->
+        <div id="screen_settings">
+           <div id="nameGame">settings</div>
+            <hr id="hrTop">
+
+            <hr id="hrBottom">
+            <div id="details">
+              <span id="back">Backing</span>
+            </div>
+        </div>
+
+        <!-- shop -->
+         <div id="screen_shop">
+            <div id="nameGame">shop</div>
+            <hr id="hrTop">
+
+            <hr id="hrBottom">
+            <div id="details">
+              <span id="back">Backing</span>
+            </div>
+         </div>
+
+        <!--play-->
+        <div id="screen_play">
+          <div id="health"></div>
+          <div id="moneys" style="display: none">
+            <img id="money" src="./Animations/Bonuses/money.gif">
+            <span id="counts">0</span>
+          </div>
+          <div id="time"><span id="timeScope">0</span> ms</div>
+          <img src="./Animations/Dino/Dino.gif" id="dino" class="dinoV" alt="" data-Id="dino" style="display: none">
+          <div id="loading">
+            <img src="./Animations/Menu/logotip.png" id="logo">
+            <span id="load">Loading</span>
+          </div>
+        </div>
+        </div>
+
+        <div id="screen_pause">
+
+        </div>
+      </div>
+    </main>
+
+      <!-- <div class="window">
+        <div id="health"></div>
+        <div id="moneys" style="display: none">
+          <img id="money" src="./Animations/Bonuses/money.gif">
+          <span id="counts">0</span>
+        </div>
+        <img id="game" src="./Animations/Window/offWindow.gif">
+        <img src="./Animations/Dino/Dino.gif" id="dino" class="dinoV" alt="" data-Id="dino">
+        <div id="loading">
+          <span id="load">Loading</span>
+        </div>
+      </div> -->
+
+    <script defer src="./scripts.js"></script>
+  </body>
+</html>

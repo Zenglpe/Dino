@@ -1,0 +1,350 @@
+@font-face {
+  font-family: pixel;
+  src: url('./Fonts/Jacquard12-Regular.ttf');
+}
+body {
+  margin: 0px;
+  transition: 1s;
+  background-color: black;
+}
+
+#window {
+  display: block;
+  width: 1000px;
+  height: 600px;
+  margin: auto;
+  z-index: 1;
+}
+
+#nameGame, #balance {
+  width: 400px;
+  margin: auto;
+  position: absolute;
+  top: 180px;
+  text-align: center;
+  left: 30px;
+  right: 0px;
+  font-size: 40px;
+  font-family: pixel;
+  color: rgb(150 250 150);
+}
+
+#hrTop, #hrBottom {
+  width: 550px;
+  height: 1px;
+  background-color: rgb(150 250 150);
+  position: absolute;
+  top: 225px;
+  left: 40px;
+  right: 0px;
+  margin: auto;
+  border: 0px;
+}
+
+#hrBottom {
+  top: 450px
+}
+
+#balance {
+  color: orange; 
+  width: 550px;
+  left: 40px;
+  font-size: 20px;
+  top: 225px;
+  border: 2px solid orange;
+  border-top: 0px;
+  border-radius: 5px;
+}
+
+#details {
+  color: rgb(150 250 150);
+  text-align: center;
+  width: 550px;
+  position: absolute;
+  left: 30px;
+  right: 0px;
+  top: 451px;
+  font-family: pixel;
+  font-size: 16px;
+  margin: auto;
+}
+
+#menu {
+  width:700px;
+  position: absolute;
+  top: 240px;
+  left: 120px;
+  right: 0px;
+  margin: auto
+}
+
+.menu_tag {
+  width: 150px;
+  margin-left: 40px;
+  cursor: pointer;
+  transition: 100ms;
+  opacity: 0.4;
+}
+.menu_tag:hover {
+  transition: 90ms;
+  transform: translateY(7px);
+}
+
+#health {
+  display: inline;
+  width: 600px;
+  position: absolute;
+  text-align: center;
+  top: 190px;
+  margin: auto;
+  left: 0px;
+  right: 0px;
+  transition: 0.5s;
+}
+
+.hp {
+  width: 25px;
+  margin-left: 3px;
+}
+
+#moneys {
+  color: yellow;
+  width: 140px;
+  font-family: pixel;
+  font-size: 30px;
+  display: inline;
+  position: absolute;
+  top: 200px;
+  margin: auto;
+  left: -465px;
+  overflow: hidden;
+  right: 0px;
+  transition: 0.5s;
+  float: left;
+  text-align: center;
+}
+
+#money {
+  width: 15px;
+  position: relative;
+  top: 4px;
+  animation: onmoney 10s infinite;
+}
+
+#time {
+  width: 200px;
+  text-align: right;
+  color: rgb(150 250 150);
+  font-family: pixel;
+  position: absolute;
+  top: 200px;
+  margin: auto;
+  left: 480px;
+  right: 0px;
+  font-size: 30px;
+}
+
+#loading {
+  opacity: 0;
+  width:350px;
+  font-size: 60px;
+  font-family: pixel;
+  position: absolute;
+  left:185px;
+  right:0px;
+  top: 250px;
+  margin: auto;
+  color: rgb(150 250 150);
+}
+
+#back {
+  color: yellow;
+  padding: 0px 4px;
+  border-radius: 5px;
+  margin: 1px;
+  cursor: pointer;
+  transition: 220ms;
+}
+
+#back:hover {
+  color: rgb(150 250 150);
+}
+
+.dinoV {
+  width: 75px;
+  margin: auto;
+  position: absolute;
+  top: 397px;
+  left: -550px;
+  right: 0px;
+  z-index: 2;
+}
+
+.dinoH {
+  width: 63px;
+  margin: auto;
+  position: absolute;
+  top: 440px;
+  left: -550px;
+  right: 0px;
+  z-index: 2;
+}
+
+.evil{ 
+  opacity: 0;
+  height: 40px;
+  margin: auto;
+  position: absolute;
+  left: 740px;
+  right: 0px;
+  top: 431px;
+  z-index: 1;
+}
+
+#logo {
+  width: 100px;
+  opacity: 1;
+  top: 100px;
+  margin-left: 50px;
+}
+
+.bonus {
+  top: 442px;
+  height: 27px;
+  animation-delay: 1s;
+  z-index: 1;
+}
+
+.cactus_1 {
+  width: 25px;
+}
+.cactus_2 {
+  width: 35px;
+}
+.cactus_3 {
+  width: 55px;
+}
+
+.dragonTop {
+  top: 380px;
+  height: 35px;
+}
+.dragonCenter {
+  top: 400px;
+  height: 35px;
+}
+.dragonBottom {
+  top: 435px;
+  height: 35px;
+}
+
+
+.giftTop {
+  top: 395px;
+}
+.giftBottom {
+  top: 439px;
+}
+
+.clouds {
+  opacity: 0;
+  width: 100px;
+  position: absolute;
+  left: 680px;
+  right: 0px;
+  margin: auto;
+  top: 225px;
+}
+
+@keyframes jump {
+  50% {
+    transform: translateY(-65px);
+  }
+  from {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes step {
+  20% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-690px);
+  }
+}
+
+@keyframes loadingStart {
+  to {
+    opacity: 1;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  59% {
+    color: rgb(150 250 150);
+  }
+  100% {
+    color: blueviolet;
+    opacity: 0;
+  }
+}
+@keyframes onbonuse {
+  to {
+    transform: translateX(0px) rotate3d(0,0,0,0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-690px) rotateZ(360deg);
+  }
+}
+
+@keyframes oncloud {
+  to {
+    transform: translateX(0px);
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-590px);
+  }
+}
+
+@keyframes onmoney {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
