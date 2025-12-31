@@ -1,3 +1,47 @@
+/**
+ * @author Evgeniy
+ * @description 2D Game(DINO)
+ * @version 1.1.0 
+ */
+
+Object.defineProperties(HTMLElement.prototype, {
+    hitBoxStorage: { value: false, writable: true },
+    onTrackHitBox: { value: function() {
+        if(this.hitBoxStorage) return;
+        this.hitBoxStorage = true;
+        // console.log('Отслеживание...', this)
+        this.startTrackHitBoxEvil()
+    } },
+    offTrackHitBox: { value: function() {
+        this.hitBoxStorage = false;
+        // console.log('No_speek', this, this.hitBoxStorage)
+    } },
+    startTrackHitBoxEvil: { value: async function() {
+        if(!this.hitBoxStorage) return;
+        // console.log('speet', this, this.hitBoxStorage)
+        const positionEvil = this.getBoundingClientRect()
+        const positionDino = Dino.box_dino.getBoundingClientRect()
+
+        switch(this.dataset.ID) {
+            case 'cactus_1':
+            case 'cactus_2':
+            case 'cactus_3':
+                if(
+                    (positionEvil.left > positionDino.left) && (positionEvil.left < positionDino.right)
+                ) {
+                    console.log('Совпадение по горизонтали!');
+                }
+                break;
+        }
+        
+        await this.wait(100)
+        // this.startTrackHitBoxEvil(this)
+    } },
+    wait: { value: async function (duration) {
+        return new Promise(resolve => setTimeout(resolve, duration))
+    } },
+})
+
 class Events {
     #_stateKeyPress = false;
     constructor() {
@@ -103,9 +147,9 @@ class Game extends Events {
             ['cloudLight', './Animations/Clouds/Cloud/cloudLight.gif'],
         ])],
         ['cactuses', new Map([
-            [ 'one',  [/* cactuses */]],
-            [ 'two',  [/* cactuses */]],
-            ['three', [/* cactuses */]],
+            [ 'one',  [ /* CACTUSES */ ]],
+            [ 'two',  [ /* CACTUSES */ ]],
+            ['three', [ /* CACTUSES */ ]],
         ])],
     ])
     constructor() {
@@ -185,6 +229,7 @@ class Game extends Events {
 
 class Details extends Game {
     static balance = 0;
+    static time = document.querySelector('#time');
     #_moneys = 0;
     #_timeScope = 0;
     #_timeElement = document.querySelector('#timeScope')
@@ -227,7 +272,7 @@ class Details extends Game {
     reloadHealth() {
         const hp = document.querySelector('#health');
         const length = hp.childElementCount;
-        if(length <= 0) this.stop()
+        if(length <= 0) this.pause()
     }
     async addMoney(n) {
         if(n < 0 || n > 1_000) return; 
@@ -283,17 +328,25 @@ class Details extends Game {
         this.#_moneys = 0;
         this.delHealth(10)
         super.stop()
+        this.toggleWindow('home')
+    }
+    pause() {
+        this.stop()
+        this.toggleWindow('pause')
     }
 }
 
 class Evils extends Details {
     #_evils = [];
-    evilsAll = [];
+    #_evils_all = [];
+    #_evils_box = [];
+    hitBoxStorage = false;
     cloudStorage = false;
+    hitBoxStorage = false;
     clouds = new Map([
-        ['light', [/* clouds */]],
-        ['dark',  [/* clouds */]],
-        ['all', []]
+        ['light', [/* CLOUDS */]],
+        ['dark',  [/* CLOUDS */]],
+        ['all', [/* ELEMENTS */]],
     ])
     #_bonuses = new Map([
         ['giftTop', 'HTMLElement'],
@@ -379,7 +432,7 @@ class Evils extends Details {
             const position = (evil.classList.contains('dragonBottom')) ? 'giftTop' : 'giftBottom';
             this.#_appendGift( this.#_bonuses.get(position).cloneNode() )
         }
-        if(evil.dataset.id === 'money') {
+        if(evil.dataset.id === 'money') {   
             const r = Math.floor(Math.random() * super.wave)
             for(let i = 0; i < r; i++) {
                 this.#_appendMoney(evil.cloneNode())
@@ -388,44 +441,69 @@ class Evils extends Details {
             await super.wait(super.speed*130)
             return;
         }
-        this.evilsAll.push(evil)
+        this.#_evils_all.push(evil)
         document.body.append(evil)
+        switch(evil.dataset.id) {
+            case 'cactus_1':
+            case 'cactus_2':
+            case 'cactus_3':
+                this.playAnimation(this.addHitBox(evil.dataset.id), 'step', speed*3, 'linear')
+        }
         this.playAnimation(evil, 'step', speed*3, 'linear')
         await super.wait(interval)
     }
     removeEvil() {
-        for(let el of this.evilsAll) el.remove()
+        for(let el of this.#_evils_all) {
+            el.offTrackHitBox();
+            el.remove()
+        }
     }
     #_appendGift(bonus) {
-        this.evilsAll.push(bonus)
+        this.#_evils_all.push(bonus)
         bonus.dataset.id = `gift`;
         document.body.append(bonus)
         this.playAnimation(bonus, 'step', super.speed*3, 'linear')
     }
     #_appendMoney(bonus) {
-        this.evilsAll.push(bonus)
+        this.#_evils_all.push(bonus)
         bonus.dataset.id = `money`;
         document.body.append(bonus)
         this.playAnimation(bonus, 'step', super.speed*3, 'linear')
     }
-    
+    addHitBox(cactusName) {
+        const boxElement = document.createElement('div');
+        boxElement.className = `evil box_${cactusName}`;
+        this.#_evils_box.push(boxElement)
+        document.body.append(boxElement)
+        return boxElement;
+    }
     playAnimation(el, name, duration, animationTF) {
         const IDsBonus = ['money', 'gift']
-        let getBonus = IDsBonus.some(ID => el.dataset.id === ID)
-        let getCloud = el.dataset.id === 'cloud';
+        let getBonus = IDsBonus.some(ID => el?.dataset?.id === ID)
+        let getCloud = el?.dataset?.id === 'cloud';
         
         el.style.animationDelay = '1s';
         el.style.animation = `${getBonus ? 'onbonuse' : getCloud ? 'oncloud' : name} ${duration}s ${animationTF}`;
 
+        track: el.addEventListener('animationstart', e => {
+            if(el.dataset.id !== 'dino' && el.className.includes('box')) {
+                el.onTrackHitBox()
+            }
+        })
         el.addEventListener('animationend', e => {
             el.style.animationName = null;
-            if(el.dataset.id !== 'dino') {
-                this.evilsAll.shift()
-                el.remove();
-            }
             if(getCloud) {
                 this.clouds.get('all').shift()
             }
+            if(el.dataset.id !== 'dino') {
+                if(el.className.includes('box')) {
+                    el.offTrackHitBox()
+                    this.#_evils_box.shift()
+                }
+                this.#_evils_all.shift()
+                el.remove();
+            }
+            return;
         })
     }    
     start() {
@@ -451,18 +529,22 @@ class Evils extends Details {
 
 class Dino extends Evils {
     static dino = document.querySelector('#dino');
+    static box_dino = document.querySelector('#box_dino');
     up() {
+        Dino.box_dino.classList.remove('box_dino_h')
         Dino.dino.src = Game.urls.get('dinoUp')
         Dino.dino.classList.remove('dinoH')
         Dino.dino.classList.add('dinoV')
     }
     down() {
+        Dino.box_dino.classList.add('box_dino_h')
         Dino.dino.src = '';
         Dino.dino.classList.add('dinoH')
         Dino.dino.classList.remove('dinoV')
         Dino.dino.src = Game.urls.get('dinoDown')
     } 
     jump() {
+        super.playAnimation(Dino.box_dino , 'jump', super.speed, 'ease-out')
         super.playAnimation(Dino.dino, 'jump', super.speed, 'ease-out')
     }
     async stop() {
@@ -474,9 +556,11 @@ class Dino extends Evils {
     async start() {
         if(Game.localStorage) return;
         this.toggleWindow('play')
+        this.display(Details.time, 'none')
         super.loading()
         await this.wait(5000)
         this.display(Dino.dino, 'block')
+        this.display(Details.time, 'block')
         this.up()
         super.start()
     };
@@ -484,12 +568,3 @@ class Dino extends Evils {
 
 const dino = new Dino()
 dino.home()
-
-setInterval((() => {
-    let wave = 1;
-    return () => {
-        dino.toggleTheme()
-        dino.addWave(wave++)
-        dino.addMoney(500)
-    }
-})(), 25000)
