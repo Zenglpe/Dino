@@ -9,33 +9,33 @@ Object.defineProperties(HTMLElement.prototype, {
     onTrackHitBox: { value: function() {
         if(this.hitBoxStorage) return;
         this.hitBoxStorage = true;
-        // console.log('Отслеживание...', this)
         this.startTrackHitBoxEvil()
     } },
     offTrackHitBox: { value: function() {
         this.hitBoxStorage = false;
-        // console.log('No_speek', this, this.hitBoxStorage)
     } },
     startTrackHitBoxEvil: { value: async function() {
         if(!this.hitBoxStorage) return;
-        // console.log('speet', this, this.hitBoxStorage)
+        console.log(this)
         const positionEvil = this.getBoundingClientRect()
         const positionDino = Dino.box_dino.getBoundingClientRect()
 
-        switch(this.dataset.ID) {
-            case 'cactus_1':
-            case 'cactus_2':
-            case 'cactus_3':
+        switch(this.dataset.id) {
+            case 'box_cactus_1':
+            case 'box_cactus_2':
+            case 'box_cactus_3':
                 if(
-                    (positionEvil.left > positionDino.left) && (positionEvil.left < positionDino.right)
+                    (((positionEvil.left > positionDino.left) && (positionEvil.left < positionDino.right))   ||
+                    ((positionEvil.right > positionDino.left) && (positionEvil.right < positionDino.right))) &&
+                    positionDino.bottom > positionEvil.top
                 ) {
-                    console.log('Совпадение по горизонтали!');
+                    console.log('Совпадение по горизонтали и вертикале!');
+                    
                 }
-                break;
         }
         
         await this.wait(100)
-        // this.startTrackHitBoxEvil(this)
+        this.startTrackHitBoxEvil()
     } },
     wait: { value: async function (duration) {
         return new Promise(resolve => setTimeout(resolve, duration))
@@ -430,7 +430,7 @@ class Evils extends Details {
             interval = (speed * 1000) + (Math.random() * (speed * 1000));
         if(evil.dataset.id === 'dragon') {
             const position = (evil.classList.contains('dragonBottom')) ? 'giftTop' : 'giftBottom';
-            this.#_appendGift( this.#_bonuses.get(position).cloneNode() )
+            this.#_appendGift(this.#_bonuses.get(position).cloneNode())
         }
         if(evil.dataset.id === 'money') {   
             const r = Math.floor(Math.random() * super.wave)
@@ -443,12 +443,7 @@ class Evils extends Details {
         }
         this.#_evils_all.push(evil)
         document.body.append(evil)
-        switch(evil.dataset.id) {
-            case 'cactus_1':
-            case 'cactus_2':
-            case 'cactus_3':
-                this.playAnimation(this.addHitBox(evil.dataset.id), 'step', speed*3, 'linear')
-        }
+        this.playAnimation(this.addHitBox(evil), 'step', speed*3, 'linear')
         this.playAnimation(evil, 'step', speed*3, 'linear')
         await super.wait(interval)
     }
@@ -463,18 +458,28 @@ class Evils extends Details {
         bonus.dataset.id = `gift`;
         document.body.append(bonus)
         this.playAnimation(bonus, 'step', super.speed*3, 'linear')
+        this.playAnimation(this.addHitBox(bonus), 'step', super.speed*3, 'linear')
+        
     }
     #_appendMoney(bonus) {
         this.#_evils_all.push(bonus)
         bonus.dataset.id = `money`;
         document.body.append(bonus)
         this.playAnimation(bonus, 'step', super.speed*3, 'linear')
+        this.playAnimation(this.addHitBox(bonus), 'step', super.speed*3, 'linear')
     }
-    addHitBox(cactusName) {
+    addHitBox(evil) {
         const boxElement = document.createElement('div');
-        boxElement.className = `evil box_${cactusName}`;
+        boxElement.dataset.id = `box_${evil.dataset.id}`;
+        switch(evil.dataset.id) {
+            case 'cactus_1':
+            case 'cactus_2':
+            case 'cactus_3':
+                boxElement.className = `evil box_${evil.dataset.id}`;
+                document.body.append(boxElement)
+                break;
+            }
         this.#_evils_box.push(boxElement)
-        document.body.append(boxElement)
         return boxElement;
     }
     playAnimation(el, name, duration, animationTF) {
@@ -488,6 +493,7 @@ class Evils extends Details {
         track: el.addEventListener('animationstart', e => {
             if(el.dataset.id !== 'dino' && el.className.includes('box')) {
                 el.onTrackHitBox()
+                return;
             }
         })
         el.addEventListener('animationend', e => {
@@ -497,8 +503,8 @@ class Evils extends Details {
             }
             if(el.dataset.id !== 'dino') {
                 if(el.className.includes('box')) {
-                    el.offTrackHitBox()
-                    this.#_evils_box.shift()
+                    el.offTrackHitBox();
+                    this.#_evils_box.shift();
                 }
                 this.#_evils_all.shift()
                 el.remove();
