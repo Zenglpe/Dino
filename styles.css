@@ -198,7 +198,6 @@ body {
   width: 30px;
   height: 50px;
   top: 420px;
-  background-color: blue;
   z-index: 3;
 }
 .box_dino_h {
@@ -235,19 +234,16 @@ body {
   opacity: 0.5;
   width: 15px;
   margin-top: 5px;
-  background-color: green;
 }
 .box_cactus_2 {
   opacity: 0.5;
   width: 20px;
   margin-top: 5px;
-  background-color: blue;
 }
 .box_cactus_3 {
   opacity: 0.5;
   width: 30px;
   margin-top: 5px;
-  background-color: red;
 }
 
 .cactus_1 {
@@ -263,17 +259,14 @@ body {
 .dragonTop {
   top: 380px;
   height: 35px;
-  background-color: aqua;
 }
 .dragonCenter {
   top: 400px;
   height: 35px;
-  background-color: aqua;
 }
 .dragonBottom {
   top: 435px;
   height: 35px;
-  background-color: aqua;
 }
 
 

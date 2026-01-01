@@ -4,44 +4,6 @@
  * @version 1.1.0 
  */
 
-Object.defineProperties(HTMLElement.prototype, {
-    hitBoxStorage: { value: false, writable: true },
-    onTrackHitBox: { value: function() {
-        if(this.hitBoxStorage) return;
-        this.hitBoxStorage = true;
-        this.startTrackHitBoxEvil()
-    } },
-    offTrackHitBox: { value: function() {
-        this.hitBoxStorage = false;
-    } },
-    startTrackHitBoxEvil: { value: async function() {
-        if(!this.hitBoxStorage) return;
-        console.log(this)
-        const positionEvil = this.getBoundingClientRect()
-        const positionDino = Dino.box_dino.getBoundingClientRect()
-
-        switch(this.dataset.id) {
-            case 'box_cactus_1':
-            case 'box_cactus_2':
-            case 'box_cactus_3':
-                if(
-                    (((positionEvil.left > positionDino.left) && (positionEvil.left < positionDino.right))   ||
-                    ((positionEvil.right > positionDino.left) && (positionEvil.right < positionDino.right))) &&
-                    positionDino.bottom > positionEvil.top
-                ) {
-                    console.log('Совпадение по горизонтали и вертикале!');
-                    
-                }
-        }
-        
-        await this.wait(100)
-        this.startTrackHitBoxEvil()
-    } },
-    wait: { value: async function (duration) {
-        return new Promise(resolve => setTimeout(resolve, duration))
-    } },
-})
-
 class Events {
     #_stateKeyPress = false;
     constructor() {
@@ -469,16 +431,18 @@ class Evils extends Details {
         this.playAnimation(this.addHitBox(bonus), 'step', super.speed*3, 'linear')
     }
     addHitBox(evil) {
-        const boxElement = document.createElement('div');
-        boxElement.dataset.id = `box_${evil.dataset.id}`;
+        let boxElement = evil;
         switch(evil.dataset.id) {
             case 'cactus_1':
             case 'cactus_2':
             case 'cactus_3':
+                boxElement = document.createElement('div')
                 boxElement.className = `evil box_${evil.dataset.id}`;
                 document.body.append(boxElement)
                 break;
             }
+        boxElement.classList.add(`box_${evil.dataset.id}`)
+        boxElement.dataset.id = (`box_${evil.dataset.id}`);
         this.#_evils_box.push(boxElement)
         return boxElement;
     }
@@ -574,3 +538,57 @@ class Dino extends Evils {
 
 const dino = new Dino()
 dino.home()
+
+Object.defineProperties(HTMLElement.prototype, {
+    hitBoxStorage: { value: false, writable: true },
+    onTrackHitBox: { value: function() {
+        if(this.hitBoxStorage) return;
+        this.hitBoxStorage = true;
+        this.startTrackHitBoxEvil()
+    } },
+    offTrackHitBox: { value: function() {
+        this.hitBoxStorage = false;
+    } },
+    startTrackHitBoxEvil: { value: async function() {
+        if(!this.hitBoxStorage) return;
+        const positionEvil = this.getBoundingClientRect()
+        const positionDino = Dino.box_dino.getBoundingClientRect()
+        const isRectangle = (((positionDino.left > positionEvil.left  && positionDino.left < positionEvil.right) || (positionDino.right > positionEvil.left  && positionDino.right < positionEvil.right)) )
+        if (!isRectangle) {
+           await this.wait(100)
+           return this.startTrackHitBoxEvil()
+        }
+
+        switch(this.dataset.id) {
+            case 'box_cactus_1':
+            case 'box_cactus_2':
+            case 'box_cactus_3':
+                if(positionDino.bottom > positionEvil.top) dino.delHealth(1)
+                await this.wait(250)
+                return this.startTrackHitBoxEvil()
+            case 'box_dragon':
+                const dragonPosition = this.className.match(/dragon[^\s]+(?=\s)/i).toString()
+                switch(dragonPosition) {
+                    case 'dragonTop':
+                    case 'dragonCenter':
+                        if (positionDino.top < positionEvil.bottom) dino.delHealth(1)
+                            await this.wait(350)
+                            return this.startTrackHitBoxEvil()
+                    case 'dragonBottom':
+                        if (positionDino.bottom > positionEvil.top) dino.delHealth(1)
+                            await this.wait(350)
+                            return this.startTrackHitBoxEvil()
+                }
+                case 'box_money':
+                    dino.addMoney(100)
+                case 'box_gift':
+                    dino.addHealth(1)
+        }
+        
+        await this.wait(100)
+        this.startTrackHitBoxEvil()
+    } },
+    wait: { value: async function (duration) {
+        return new Promise(resolve => setTimeout(resolve, duration))
+    } },
+})
