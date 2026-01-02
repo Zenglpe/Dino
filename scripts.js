@@ -201,7 +201,7 @@ class Details extends Game {
             return this.#_clearTime();
         }
         this.#_timeElement.textContent = (this.#_timeScope++).toLocaleString();
-        await this.wait(100);
+        await this.wait(100)
         this.#_timeStart()
     }
     #_clearTime() {
@@ -447,7 +447,7 @@ class Evils extends Details {
         return boxElement;
     }
     playAnimation(el, name, duration, animationTF) {
-        const IDsBonus = ['money', 'gift']
+        const IDsBonus = ['box_money', 'box_gift']
         let getBonus = IDsBonus.some(ID => el?.dataset?.id === ID)
         let getCloud = el?.dataset?.id === 'cloud';
         
@@ -551,41 +551,59 @@ Object.defineProperties(HTMLElement.prototype, {
     } },
     startTrackHitBoxEvil: { value: async function() {
         if(!this.hitBoxStorage) return;
+
         const positionEvil = this.getBoundingClientRect()
         const positionDino = Dino.box_dino.getBoundingClientRect()
-        const isRectangle = (((positionDino.left > positionEvil.left  && positionDino.left < positionEvil.right) || (positionDino.right > positionEvil.left  && positionDino.right < positionEvil.right)) )
+
+        const isRectangle = (((positionDino.left > positionEvil.left  && positionDino.left < positionEvil.right) || 
+                            (positionDino.right > positionEvil.left  && positionDino.right < positionEvil.right)))
         if (!isRectangle) {
            await this.wait(100)
            return this.startTrackHitBoxEvil()
         }
 
+        // need add time evils...
+ 
         switch(this.dataset.id) {
             case 'box_cactus_1':
             case 'box_cactus_2':
             case 'box_cactus_3':
                 if(positionDino.bottom > positionEvil.top) dino.delHealth(1)
+                console.log('cactus')
                 await this.wait(250)
-                return this.startTrackHitBoxEvil()
+                break;
             case 'box_dragon':
                 const dragonPosition = this.className.match(/dragon[^\s]+(?=\s)/i).toString()
                 switch(dragonPosition) {
                     case 'dragonTop':
                     case 'dragonCenter':
                         if (positionDino.top < positionEvil.bottom) dino.delHealth(1)
-                            await this.wait(350)
-                            return this.startTrackHitBoxEvil()
+                        console.log('dragon')
+                        await this.wait(350)
+                        break;
                     case 'dragonBottom':
                         if (positionDino.bottom > positionEvil.top) dino.delHealth(1)
-                            await this.wait(350)
-                            return this.startTrackHitBoxEvil()
+                        console.log('cactus')
+                        await this.wait(350)
+                        break;
                 }
                 case 'box_money':
-                    dino.addMoney(100)
+                    this.remove()
+                    const addMoney = (dino.wave * 10) + Math.floor(Math.random() * 100)
+                    dino.addMoney(addMoney)
+                    console.log('money')
+                    await this.wait(200)
+                    break;
                 case 'box_gift':
+                    this.remove()
                     dino.addHealth(1)
+                    console.log('gift')
+                    await this.wait(200)
+                    break;
+                default:
+                    await this.wait(100)
         }
         
-        await this.wait(100)
         this.startTrackHitBoxEvil()
     } },
     wait: { value: async function (duration) {
