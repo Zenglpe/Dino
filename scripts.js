@@ -72,15 +72,12 @@ class Events {
                 case 'menu_start':
                     this.start()
                     break;
-                // case 'menu_settings':
-                //     this.toggleWindow('settings')
-                //     break;
-                // case 'menu_shop':
-                //     this.toggleWindow('shop')
-                //     break;
-                // case 'back':
-                //     this.toggleWindow('home')
-                //     break;
+                case 'new_game':
+                    this.start()
+                    break;
+                case 'home_game':
+                    this.home()
+                    break;
             }
         })
     }
@@ -92,6 +89,7 @@ class Game extends Events {
     #_wave = 1;
     #_speed = 1;
     #_lightTheme = false;
+    static timeIntervalHB = 250;
     static localStorage = false;
     static urls = new Map([
         ['offWindow', './Animations/Window/homeWindow.gif'],
@@ -150,16 +148,22 @@ class Game extends Events {
         return new Promise(resolve => setTimeout(resolve, duration))
     }
     async addWave(n) {
-        if(!Game.localStorage || typeof n !== 'number' || n > 8) return this.#_wave;
+        if(!Game.localStorage || typeof n !== 'number' || n > 8) return;
+
+        Game.timeIntervalHB = (250 - (27 * n))
+
         if(n < 1) {
-            this.#_speed = 0.9;
+            Game.timeIntervalHB = 250;
+            this.#_speed = 1;
             this.#_wave = 1;
             return this.#_wave;
         }
+
         this.spawnEvils = false;
         await this.wait(5000)
         this.removeEvil()
         this.spawnEvils = true;
+
         if(Game.localStorage) {
             this.#_speed = (+`0.${10-n}`);
             this.#_wave = n;
@@ -305,6 +309,11 @@ class Evils extends Details {
     hitBoxStorage = false;
     cloudStorage = false;
     hitBoxStorage = false;
+    timeIntervalHitBoxes = new Map([
+        ['cactus', 250],
+        ['dragon', 350],
+        ['bonus',  200],
+    ])
     clouds = new Map([
         ['light', [/* CLOUDS */]],
         ['dark',  [/* CLOUDS */]],
@@ -373,11 +382,15 @@ class Evils extends Details {
         const random = Math.floor(Math.random() * 9)
         const cloud = this.clouds.get((this.theme === 'light') ? 'light' : 'dark')[random].cloneNode(true);
         
-        this.clouds.get('all').push(cloud)
         
         document.body.append(cloud)
         this.playAnimation(cloud, 'step', super.speed*10, 'linear')
         
+        this.clouds.get('all').push(cloud)
+        cloud.addEventListener('animationend', e => {
+            this.clouds.get('all').shift()
+        })
+
         await this.wait(super.speed * 5000)
         this.setCloud()
     }
@@ -392,12 +405,12 @@ class Evils extends Details {
             interval = (speed * 1000) + (Math.random() * (speed * 1000));
         if(evil.dataset.id === 'dragon') {
             const position = (evil.classList.contains('dragonBottom')) ? 'giftTop' : 'giftBottom';
-            this.#_appendGift(this.#_bonuses.get(position).cloneNode())
+            this.#_appendBonus(this.#_bonuses.get(position).cloneNode(), 'gift')
         }
         if(evil.dataset.id === 'money') {   
             const r = Math.floor(Math.random() * super.wave)
             for(let i = 0; i < r; i++) {
-                this.#_appendMoney(evil.cloneNode())
+                this.#_appendBonus(evil.cloneNode(), 'money')
                 await super.wait(super.speed*150)
             }
             await super.wait(super.speed*130)
@@ -407,6 +420,11 @@ class Evils extends Details {
         document.body.append(evil)
         this.playAnimation(this.addHitBox(evil), 'step', speed*3, 'linear')
         this.playAnimation(evil, 'step', speed*3, 'linear')
+        evil.addEventListener('animationend', e => {
+            this.#_evils_all.shift()
+            evil.remove();
+        })
+        
         await super.wait(interval)
     }
     removeEvil() {
@@ -415,23 +433,22 @@ class Evils extends Details {
             el.remove()
         }
     }
-    #_appendGift(bonus) {
+    #_appendBonus(bonus, id) {
+        const time = super.speed*3;
         this.#_evils_all.push(bonus)
-        bonus.dataset.id = `gift`;
+        bonus.dataset.id = id;
+        this.playAnimation(bonus, 'step', time, 'linear')
+        this.playAnimation(this.addHitBox(bonus), 'step', time, 'linear')
         document.body.append(bonus)
-        this.playAnimation(bonus, 'step', super.speed*3, 'linear')
-        this.playAnimation(this.addHitBox(bonus), 'step', super.speed*3, 'linear')
+        bonus.addEventListener('animationend', e => {
+            this.#_evils_all.shift()
+            bonus.remove();
+        })
         
-    }
-    #_appendMoney(bonus) {
-        this.#_evils_all.push(bonus)
-        bonus.dataset.id = `money`;
-        document.body.append(bonus)
-        this.playAnimation(bonus, 'step', super.speed*3, 'linear')
-        this.playAnimation(this.addHitBox(bonus), 'step', super.speed*3, 'linear')
     }
     addHitBox(evil) {
         let boxElement = evil;
+        const time = super.speed *3;
         switch(evil.dataset.id) {
             case 'cactus_1':
             case 'cactus_2':
@@ -444,6 +461,19 @@ class Evils extends Details {
         boxElement.classList.add(`box_${evil.dataset.id}`)
         boxElement.dataset.id = (`box_${evil.dataset.id}`);
         this.#_evils_box.push(boxElement)
+
+        const timeIntervalHitBix = (time * 1000)-((time * 1000)/3);
+        boxElement.addEventListener('animationstart', e => {
+            console.log('animationstart')
+            setTimeout(boxElement.onTrackHitBox.bind(boxElement), timeIntervalHitBix)
+        })
+        boxElement.addEventListener('animationend', e => {
+            console.log('animationend')
+            boxElement.offTrackHitBox();
+            this.#_evils_box.shift();
+            boxElement.remove();
+        })
+
         return boxElement;
     }
     playAnimation(el, name, duration, animationTF) {
@@ -453,27 +483,8 @@ class Evils extends Details {
         
         el.style.animationDelay = '1s';
         el.style.animation = `${getBonus ? 'onbonuse' : getCloud ? 'oncloud' : name} ${duration}s ${animationTF}`;
-
-        track: el.addEventListener('animationstart', e => {
-            if(el.dataset.id !== 'dino' && el.className.includes('box')) {
-                el.onTrackHitBox()
-                return;
-            }
-        })
         el.addEventListener('animationend', e => {
-            el.style.animationName = null;
-            if(getCloud) {
-                this.clouds.get('all').shift()
-            }
-            if(el.dataset.id !== 'dino') {
-                if(el.className.includes('box')) {
-                    el.offTrackHitBox();
-                    this.#_evils_box.shift();
-                }
-                this.#_evils_all.shift()
-                el.remove();
-            }
-            return;
+            el.style.animationName = '';
         })
     }    
     start() {
@@ -543,67 +554,61 @@ Object.defineProperties(HTMLElement.prototype, {
     hitBoxStorage: { value: false, writable: true },
     onTrackHitBox: { value: function() {
         if(this.hitBoxStorage) return;
-        this.hitBoxStorage = true;
-        this.startTrackHitBoxEvil()
+        if(this.dataset.id.includes('box')) {
+            this.isRectangle = function(positionDino, positionEvil) {
+                return (((positionDino.left > positionEvil.left  && positionDino.left < positionEvil.right) || 
+                        (positionDino.right > positionEvil.left  && positionDino.right < positionEvil.right)))
+            };
+            
+            this.hitBoxStorage = true;
+            this.startTrackHitBoxEvil()
+            console.log('spawn ')
+        }
     } },
     offTrackHitBox: { value: function() {
         this.hitBoxStorage = false;
+        console.log('off')
     } },
     startTrackHitBoxEvil: { value: async function() {
         if(!this.hitBoxStorage) return;
-
+        console.log('Отслеживание')
         const positionEvil = this.getBoundingClientRect()
         const positionDino = Dino.box_dino.getBoundingClientRect()
+        const rectangle = !(this.isRectangle(this.getBoundingClientRect(), Dino.box_dino.getBoundingClientRect()))
 
-        const isRectangle = (((positionDino.left > positionEvil.left  && positionDino.left < positionEvil.right) || 
-                            (positionDino.right > positionEvil.left  && positionDino.right < positionEvil.right)))
-        if (!isRectangle) {
-           await this.wait(100)
+        if (rectangle) {
+           await this.wait(Game.timeIntervalHB)
            return this.startTrackHitBoxEvil()
         }
 
-        // need add time evils...
- 
         switch(this.dataset.id) {
             case 'box_cactus_1':
             case 'box_cactus_2':
             case 'box_cactus_3':
                 if(positionDino.bottom > positionEvil.top) dino.delHealth(1)
-                console.log('cactus')
-                await this.wait(250)
                 break;
             case 'box_dragon':
                 const dragonPosition = this.className.match(/dragon[^\s]+(?=\s)/i).toString()
                 switch(dragonPosition) {
                     case 'dragonTop':
                     case 'dragonCenter':
-                        if (positionDino.top < positionEvil.bottom) dino.delHealth(1)
-                        console.log('dragon')
-                        await this.wait(350)
+                        if (positionDino.top < positionEvil.bottom) dino.delHealth(1);
                         break;
                     case 'dragonBottom':
-                        if (positionDino.bottom > positionEvil.top) dino.delHealth(1)
-                        console.log('cactus')
-                        await this.wait(350)
+                        if (positionDino.bottom > positionEvil.top) dino.delHealth(1);
                         break;
                 }
                 case 'box_money':
-                    this.remove()
+                    this.offTrackHitBox()
                     const addMoney = (dino.wave * 10) + Math.floor(Math.random() * 100)
                     dino.addMoney(addMoney)
-                    console.log('money')
-                    await this.wait(200)
                     break;
                 case 'box_gift':
-                    this.remove()
+                    this.offTrackHitBox()
                     dino.addHealth(1)
-                    console.log('gift')
-                    await this.wait(200)
                     break;
-                default:
-                    await this.wait(100)
-        }
-        
+            }
+        this.offTrackHitBox()
         this.startTrackHitBoxEvil()
     } },
     wait: { value: async function (duration) {

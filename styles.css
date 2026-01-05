@@ -19,6 +19,32 @@ body {
   right: 0px;
 }
 
+#buttons {
+  width: 514px;
+  height: 200px;
+  position: absolute;
+  margin: auto;
+  top: 370px;
+  left: 20px;
+  right: 0px;
+  text-align: center;
+}
+
+#new_game, #home_game {
+  opacity: 0.4;
+  text-align: auto;
+  margin-left: 7px;
+  float: left;
+  width: 250px;
+  cursor: pointer;
+}
+
+#new_game:hover, #home_game:hover {
+  transition: 300ms;
+  transform: translateY(3px);
+  opacity: 1
+}
+
 #nameGame, #balance {
   width: 400px;
   margin: auto;
@@ -268,7 +294,6 @@ body {
   top: 435px;
   height: 35px;
 }
-
 
 .giftTop {
   top: 395px;
