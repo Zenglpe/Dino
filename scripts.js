@@ -8,11 +8,44 @@ class Events {
     #_stateKeyPress = false;
     constructor() {
         document.addEventListener('visibilitychange', event => {
-            this.home()
+            if(document.visibilityState === 'visible') {
+                this.onSnows()
+            } else {
+                this.home()
+                this.offSnows()
+            }
         })
         this.setMenuAnimations()
+        let heightWindow = window.innerHeight + 400;
+
+        function newStyle(height) {
+            return `
+            <style id="snows_style">
+                @keyframes snows {
+                    40% {
+                        opacity: 1;
+                    }
+                    
+                    to { 
+                        opacity: 0;
+                        transform: translateY(${height}px) rotate(${Math.floor(Math.random() * 360)}deg);
+                    }
+                }
+            </style>`;
+        }
+
+        window.addEventListener('resize', async () => {
+            this.offSnows()
+            heightWindow = window.innerHeight + 400;
+            document.querySelector('#snows_style')?.remove()
+            document.head.insertAdjacentHTML('beforeend', newStyle(heightWindow))
+            await this.wait(2000)
+            this.onSnows()
+        })  
+        document.head.insertAdjacentHTML('beforeend', newStyle(heightWindow))
     }
     #_keyDown = (event) => {
+        document.querySelector('img#game').scrollIntoView(false)
         if(event.code === 'ArrowDown' || event.code === 'ArrowRight') {
             if(!this.#_stateKeyPress) {
                 this.down()
@@ -23,6 +56,7 @@ class Events {
         }
     }
     #_keyUp = (event) => {
+        document.querySelector('img#game').scrollIntoView(false)
         this.#_stateKeyPress = false;
         if(event.code === 'ArrowDown' || event.code === 'ArrowRight') {
             this.up()
@@ -89,6 +123,7 @@ class Game extends Events {
     #_wave = 1;
     #_speed = 1;
     #_lightTheme = false;
+    #_snowStorage = false;
     static timeIntervalHB = 250;
     static localStorage = false;
     static urls = new Map([
@@ -111,6 +146,8 @@ class Game extends Events {
             [ 'two',  [ /* CACTUSES */ ]],
             ['three', [ /* CACTUSES */ ]],
         ])],
+        ['snow_green', './Animations/Menu/snow_green.png'],
+        ['snow_red', './Animations/Menu/snow_red.png'],
     ])
     constructor() {
         super()
@@ -118,6 +155,7 @@ class Game extends Events {
             let position = (i <= 8) ? 'one' : (i <= 17) ? 'two' : 'three';
             Game.urls.get('cactuses').get(position).push(`./Animations/Cactuses/cactus${i}.gif`)
         }
+        this.onSnows()
     }
     toggleTheme() {
         const gameTheme = this.#_lightTheme ? 'black' : 'white';
@@ -173,6 +211,44 @@ class Game extends Events {
     display(el, property) {
         el.style.display = (property === 'block') ? 'block' : 'none';
     }
+    onSnows = (() => {          
+        return function f() {
+            if(this.#_snowStorage) return;
+            this.#_snowStorage = true;
+            let countSnows = Math.floor(window.innerWidth / 60);
+            for(let i = 0; i <= countSnows+10; i++) {
+                this.setSnow(i)
+            }
+        }
+    })()
+    async setSnow(i) {
+        if(!this.#_snowStorage) return;
+        const snows = document.querySelector('#snows');
+        const snow = document.createElement('img')
+        const randomSize = `${10 + Math.random() * 60}px`;
+        snow.classList.add('snow')
+        snow.src = Game.urls.get('snow_green')
+        snow.alt = 'snow';
+        snow.style.left = `${i*50}px`;
+        snow.style.width = randomSize;
+        snow.style.height = randomSize;
+        snow.style.animationName = 'snows';
+        snow.style.animationDuration = `${2 + (Math.random() * 5)}s`;
+        snow.style.animationTimingFunction = 'linear';
+        snow.style.animationDelay = `${Math.random()}s`;
+        snow.addEventListener('animationend', snow.remove)
+        snows.append(snow)
+        await this.wait(2000)
+        if(!this.#_snowStorage) return;
+        this.setSnow(i)
+    }
+    async offSnows() {
+        this.#_snowStorage = false;
+        while(true) {
+            if(snows.childNodes.length === 0) return;
+            for(let el of snows.childNodes) el.remove()
+        }
+    }
     start() {
         Game.localStorage = true;
         this.display(this.#_moneys, 'block')
@@ -198,10 +274,11 @@ class Details extends Game {
     static time = document.querySelector('#time');
     #_moneys = 0;
     #_timeScope = 0;
+    #_timeStorage = false;
     #_timeElement = document.querySelector('#timeScope')
     #_countsText = document.querySelector('#counts')
     async #_timeStart() {
-        if(!this.cloudStorage) {
+        if(!Game.localStorage) {
             return this.#_clearTime();
         }
         this.#_timeElement.textContent = (this.#_timeScope++).toLocaleString();
@@ -285,9 +362,9 @@ class Details extends Game {
     }
     start() {
         this.#_countsText.textContent = '0';
-        this.#_timeStart()
         this.addHealth(3)
         super.start()
+        this.#_timeStart()
     }
     stop() {
         Details.balance += this.#_moneys;
@@ -297,6 +374,7 @@ class Details extends Game {
         this.toggleWindow('home')
     }
     pause() {
+        this.toggleSnows()
         this.stop()
         this.toggleWindow('pause')
     }
@@ -304,16 +382,6 @@ class Details extends Game {
 
 class Evils extends Details {
     #_evils = [];
-    #_evils_all = [];
-    #_evils_box = [];
-    hitBoxStorage = false;
-    cloudStorage = false;
-    hitBoxStorage = false;
-    timeIntervalHitBoxes = new Map([
-        ['cactus', 250],
-        ['dragon', 350],
-        ['bonus',  200],
-    ])
     clouds = new Map([
         ['light', [/* CLOUDS */]],
         ['dark',  [/* CLOUDS */]],
@@ -378,17 +446,19 @@ class Evils extends Details {
         }
     }
     async setCloud() {
-        if(!this.cloudStorage) return;
+        if(Game.localStorage) return;
+        const parentElement = document.querySelector('#clouds')
         const random = Math.floor(Math.random() * 9)
         const cloud = this.clouds.get((this.theme === 'light') ? 'light' : 'dark')[random].cloneNode(true);
         
         
-        document.body.append(cloud)
+        parentElement.append(cloud)
         this.playAnimation(cloud, 'step', super.speed*10, 'linear')
         
         this.clouds.get('all').push(cloud)
         cloud.addEventListener('animationend', e => {
             this.clouds.get('all').shift()
+            cloud.remove()
         })
 
         await this.wait(super.speed * 5000)
@@ -398,6 +468,7 @@ class Evils extends Details {
         for(let el of this.clouds.get('all')) el.remove()
     }
     setEvil = async () => {
+        const parentElement = document.querySelector('#evils')
         let
             speed = super.speed,
             random = Math.floor(Math.random() * this.#_evils.length),
@@ -416,37 +487,36 @@ class Evils extends Details {
             await super.wait(super.speed*130)
             return;
         }
-        this.#_evils_all.push(evil)
-        document.body.append(evil)
+        parentElement.append(evil)
         this.playAnimation(this.addHitBox(evil), 'step', speed*3, 'linear')
         this.playAnimation(evil, 'step', speed*3, 'linear')
         evil.addEventListener('animationend', e => {
-            this.#_evils_all.shift()
             evil.remove();
         })
         
         await super.wait(interval)
     }
     removeEvil() {
-        for(let el of this.#_evils_all) {
+        const children = document.querySelector('#evils').childNodes;
+        for(let el of children) {
             el.offTrackHitBox();
             el.remove()
         }
     }
     #_appendBonus(bonus, id) {
+        const parentElement = document.querySelector('#evils')
         const time = super.speed*3;
-        this.#_evils_all.push(bonus)
         bonus.dataset.id = id;
         this.playAnimation(bonus, 'step', time, 'linear')
         this.playAnimation(this.addHitBox(bonus), 'step', time, 'linear')
-        document.body.append(bonus)
+        parentElement.append(bonus)
         bonus.addEventListener('animationend', e => {
-            this.#_evils_all.shift()
             bonus.remove();
         })
         
     }
     addHitBox(evil) {
+        const parentElement = document.querySelector('#boxes')
         let boxElement = evil;
         const time = super.speed *3;
         switch(evil.dataset.id) {
@@ -455,47 +525,47 @@ class Evils extends Details {
             case 'cactus_3':
                 boxElement = document.createElement('div')
                 boxElement.className = `evil box_${evil.dataset.id}`;
-                document.body.append(boxElement)
+                parentElement.append(boxElement)
                 break;
             }
         boxElement.classList.add(`box_${evil.dataset.id}`)
         boxElement.dataset.id = (`box_${evil.dataset.id}`);
-        this.#_evils_box.push(boxElement)
 
         const timeIntervalHitBix = (time * 1000)-((time * 1000)/3);
         boxElement.addEventListener('animationstart', e => {
-            console.log('animationstart')
             setTimeout(boxElement.onTrackHitBox.bind(boxElement), timeIntervalHitBix)
         })
         boxElement.addEventListener('animationend', e => {
-            console.log('animationend')
             boxElement.offTrackHitBox();
-            this.#_evils_box.shift();
             boxElement.remove();
         })
 
         return boxElement;
+    }
+    toggleSnows() {
+        const snows = document.querySelector('#snows');
+        for(const el of snows.children) {
+            el.src = Game.urls.get('snow_red')
+        }
     }
     playAnimation(el, name, duration, animationTF) {
         const IDsBonus = ['box_money', 'box_gift']
         let getBonus = IDsBonus.some(ID => el?.dataset?.id === ID)
         let getCloud = el?.dataset?.id === 'cloud';
         
-        el.style.animationDelay = '1s';
+        // el.style.animationDelay = '1s';
         el.style.animation = `${getBonus ? 'onbonuse' : getCloud ? 'oncloud' : name} ${duration}s ${animationTF}`;
         el.addEventListener('animationend', e => {
             el.style.animationName = '';
         })
     }    
     start() {
-        this.cloudStorage = true;
         this.spawnEvils = true;
         this.setCloud()
         this.run()
         super.start()
     }
     stop() {
-        this.cloudStorage = false;
         this.spawnEvils = false;
         this.removeCloud()
         this.removeEvil()
@@ -535,13 +605,14 @@ class Dino extends Evils {
         super.stop()
     }
     async start() {
+        const time = document.querySelector('#time');
         if(Game.localStorage) return;
         this.toggleWindow('play')
-        this.display(Details.time, 'none')
+        this.display(time, 'none')
         super.loading()
         await this.wait(5000)
         this.display(Dino.dino, 'block')
-        this.display(Details.time, 'block')
+        this.display(time, 'block')
         this.up()
         super.start()
     };
@@ -562,16 +633,13 @@ Object.defineProperties(HTMLElement.prototype, {
             
             this.hitBoxStorage = true;
             this.startTrackHitBoxEvil()
-            console.log('spawn ')
         }
     } },
     offTrackHitBox: { value: function() {
         this.hitBoxStorage = false;
-        console.log('off')
     } },
     startTrackHitBoxEvil: { value: async function() {
-        if(!this.hitBoxStorage) return;
-        console.log('Отслеживание')
+        if(!this.hitBoxStorage || !Game.localStorage) return;
         const positionEvil = this.getBoundingClientRect()
         const positionDino = Dino.box_dino.getBoundingClientRect()
         const rectangle = !(this.isRectangle(this.getBoundingClientRect(), Dino.box_dino.getBoundingClientRect()))
@@ -585,28 +653,40 @@ Object.defineProperties(HTMLElement.prototype, {
             case 'box_cactus_1':
             case 'box_cactus_2':
             case 'box_cactus_3':
-                if(positionDino.bottom > positionEvil.top) dino.delHealth(1)
+                if(positionDino.bottom > positionEvil.top) {
+                    dino.delHealth(1)
+                    dino.toggleSnows()
+                };
                 break;
             case 'box_dragon':
                 const dragonPosition = this.className.match(/dragon[^\s]+(?=\s)/i).toString()
                 switch(dragonPosition) {
                     case 'dragonTop':
                     case 'dragonCenter':
-                        if (positionDino.top < positionEvil.bottom) dino.delHealth(1);
+                        if (positionDino.top < positionEvil.bottom) {
+                            dino.delHealth(1);
+                            dino.toggleSnows()
+                        };
                         break;
                     case 'dragonBottom':
-                        if (positionDino.bottom > positionEvil.top) dino.delHealth(1);
+                        if (positionDino.bottom > positionEvil.top) {
+                            dino.delHealth(1);
+                            dino.toggleSnows()
+                        }
                         break;
                 }
-                case 'box_money':
-                    this.offTrackHitBox()
-                    const addMoney = (dino.wave * 10) + Math.floor(Math.random() * 100)
-                    dino.addMoney(addMoney)
-                    break;
-                case 'box_gift':
-                    this.offTrackHitBox()
-                    dino.addHealth(1)
-                    break;
+                break;
+            case 'box_money':
+                this.offTrackHitBox()
+                this.remove()
+                const addMoney = (dino.wave * 10) + Math.floor(Math.random() * 100)
+                dino.addMoney(addMoney)
+                break;
+            case 'box_gift':
+                this.offTrackHitBox()
+                this.remove()
+                dino.addHealth(1)
+                break;
             }
         this.offTrackHitBox()
         this.startTrackHitBoxEvil()
@@ -615,3 +695,10 @@ Object.defineProperties(HTMLElement.prototype, {
         return new Promise(resolve => setTimeout(resolve, duration))
     } },
 })
+
+let wave = 1;
+setInterval(() => {
+    dino.addWave(wave++)
+    dino.toggleTheme()
+    if(wave > 8) wave = 0;
+}, 25000)

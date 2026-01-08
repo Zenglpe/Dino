@@ -5,6 +5,8 @@
 body {
   margin: 0px;
   transition: 1s;
+  overflow-x: hidden;
+  overflow-y: hidden;
   background-color: black;
 }
 
@@ -17,25 +19,67 @@ body {
   position: absolute;
   left: 0px;
   right: 0px;
+  z-index: -1;
+}
+
+#game_block {
+  width: 740px;
+  height: 345px;
+  position: absolute;
+  left: 38px;
+  right: 0px;
+  margin: auto;
+  margin-top: 154px;
+  background-color: inherit;
+  border-radius: 30px;
+  opacity: 0.9;
+  z-index: -2;
+}
+
+#bonus_text {
+  width: 30px;
+  height: 20px;
+  color: red;
+  background-color: red;
+  position: absolute;
+  left: 222px;
+  top: 350px;
+  font-size: 2em;
+  opacity: 0;
+  font-family: pixel;
+  animation-name: bonus_game;
+  animation-duration: 500ms;
+  animation-timing-function: linear;
 }
 
 #buttons {
   width: 514px;
-  height: 200px;
+  height: 700px;
   position: absolute;
   margin: auto;
-  top: 370px;
-  left: 20px;
+  top: 270px;
+  left: 25px;
   right: 0px;
   text-align: center;
 }
 
+.snow {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  transition: 2s;
+  margin-left: 10px;
+  top: -500px;
+  left: 0px;
+  z-index: -3
+}
+
 #new_game, #home_game {
-  opacity: 0.4;
+  opacity: 0.6;
   text-align: auto;
   margin-left: 7px;
-  float: left;
-  width: 250px;
+  margin-bottom: 10px;
+  width: 240px;
   cursor: pointer;
 }
 
@@ -195,29 +239,18 @@ body {
   transition: 220ms;
 }
 
-#back:hover {
-  color: rgb(150 250 150);
-}
+#back:hover { color: rgb(150 250 150) }
 
-.dinoV {
-  width: 75px;
-  margin: auto;
+.dinoV, .dinoH {
   position: absolute;
-  top: 397px;
+  margin: auto;
   left: -550px;
   right: 0px;
-  z-index: 2;
+  z-index: 3;
 }
 
-.dinoH {
-  width: 63px;
-  margin: auto;
-  position: absolute;
-  top: 440px;
-  left: -550px;
-  right: 0px;
-  z-index: 2;
-}
+.dinoV { width: 75px; top: 397px }
+.dinoH { width: 63px; top: 440px }
 
 .box_dino_v {
   opacity: 0.5;
@@ -256,51 +289,26 @@ body {
   z-index: 1;
 }
 
-.box_cactus_1 {
+.box_cactus_1, .box_cactus_2, .box_cactus_3 {
   opacity: 0.5;
-  width: 15px;
   margin-top: 5px;
 }
-.box_cactus_2 {
-  opacity: 0.5;
-  width: 20px;
-  margin-top: 5px;
-}
-.box_cactus_3 {
-  opacity: 0.5;
-  width: 30px;
-  margin-top: 5px;
-}
+.box_cactus_1 { width: 15px }
+.box_cactus_2 { width: 20px }
+.box_cactus_3 { width: 30px }
 
-.cactus_1 {
-  width: 25px;
-}
-.cactus_2 {
-  width: 35px;
-}
-.cactus_3 {
-  width: 55px;
-}
+.cactus_1 { width: 25px }
+.cactus_2 { width: 35px }
+.cactus_3 { width: 55px }
 
-.dragonTop {
-  top: 380px;
-  height: 35px;
-}
-.dragonCenter {
-  top: 400px;
-  height: 35px;
-}
-.dragonBottom {
-  top: 435px;
-  height: 35px;
-}
+.dragonTop, .dragonCenter, .dragonBottom { height: 35px }
 
-.giftTop {
-  top: 395px;
-}
-.giftBottom {
-  top: 439px;
-}
+.dragonTop { top: 380px }
+.dragonCenter { top: 400px }
+.dragonBottom { top: 435px }
+
+.giftTop { top: 395px }
+.giftBottom { top: 439px }
 
 .clouds {
   opacity: 0;
@@ -312,12 +320,35 @@ body {
   top: 225px;
 }
 
+#screen_play {
+  background-color: red;
+}
+
 @keyframes jump {
   50% {
-    transform: translateY(-65px);
+    transform: translateY(-75px);
   }
   from {
     transform: translateY(0px);
+  }
+}
+
+@keyframes bonus_game {
+  to {
+    transform: translateY(-10px);
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0;
+  }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
 }
 

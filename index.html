@@ -2,16 +2,21 @@
 <html>
   <head>
     <title>DIINO2D</title>
+    <meta charset="utf-8">
     <meta name="author" content="Zengl">
     <meta name="description" content="Game - DINO2D">
     <link rel="icon" href="./Animations/Menu/logotip.png" type="image/png">
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
+    <div id="game_block"></div>
     <main>
+      <div id="snows"></div>
+      <div id="clouds"></div>
+      <div id="boxes"></div>
+      <div id="evils"></div>
       <div id="window">
         <img src="./Animations/Window/homeWindow.gif" id="game">
-        
         
         <!--global-->
         <div id="screen_home">
@@ -53,14 +58,20 @@
         <!--play-->
         <div id="screen_play">
           <div id="health"></div>
+
           <div id="moneys" style="display: none">
             <img id="money" src="./Animations/Bonuses/money.gif">
             <span id="counts">0</span>
           </div>
+
           <div id="time"><span id="timeScope">0</span> ms</div>
+          <div id="bonus_game">
+            
+          </div>
           
           <img src="./Animations/Dino/Dino.gif" id="dino" class="dinoV" alt="" data-Id="dino" style="display: none ">
           <div class="dinoV box_dino_v" id="box_dino" data-Id="dino"></div>
+
           <div id="loading">
             <img src="./Animations/Menu/logotip.png" id="logo"><br>
             <span id="load">Loading</span>
@@ -77,7 +88,7 @@
           </div>
 
           <div id="buttons">
-          <img src="./Animations/Menu/new_play.png" id="new_game">        
+          <img src="./Animations/Menu/new_play.png" id="new_game"><br>   
           <img src="./Animations/Menu/home_game.png" id="home_game">
         </div>
 
