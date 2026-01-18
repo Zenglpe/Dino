@@ -102,7 +102,7 @@ body {
   color: rgb(150 250 150);
 }
 
-#hrTop, #hrBottom {
+#hrTop, #hrBottom, #window_settings, #window_shop {
   width: 550px;
   height: 1px;
   background-color: rgb(150 250 150);
@@ -113,6 +113,27 @@ body {
   margin: auto;
   border: 0px;
 }
+
+#window_settings::-webkit-scrollbar, #window_shop::-webkit-scrollbar {
+  background-color: inherit;
+}
+
+#window_settings, #window_shop {
+  height: 224px;
+  overflow-y:scroll;
+  background-color: inherit;
+  border-top: 2px solid rgb(150 250 150);
+  border-bottom: 2px solid rgb(150 250 150)
+}
+
+/* .table {
+  width: 300px;
+  background-color: red;
+}
+.table_head, .table_body, .table_flag {
+  height: 50px;
+  background-color: green;
+} */
 
 #hrBottom {
   top: 450px
@@ -130,7 +151,7 @@ body {
 }
 
 #details {
-  color: rgb(150 250 150);
+  color: rgb(255 100 100);
   text-align: center;
   width: 550px;
   position: absolute;
@@ -140,6 +161,10 @@ body {
   font-family: pixel;
   font-size: 16px;
   margin: auto;
+}
+
+#details_game {
+  background-color: inherit;
 }
 
 #menu {
@@ -161,6 +186,10 @@ body {
 .menu_tag:hover {
   transition: 90ms;
   transform: translateY(7px);
+}
+
+#menu_start {
+  opacity: 1;
 }
 
 #health {
@@ -231,7 +260,8 @@ body {
 }
 
 #back {
-  color: yellow;
+  color: rgb(255, 100, 100);
+  text-decoration: underline solid rgb(255, 100, 100) 1px;
   padding: 0px 4px;
   border-radius: 5px;
   margin: 1px;
@@ -239,7 +269,92 @@ body {
   transition: 220ms;
 }
 
-#back:hover { color: rgb(150 250 150) }
+#back:hover { 
+  color: yellow; 
+  text-decoration: underline solid orange 1px; 
+}
+
+form#audio {
+  width: 265px;
+  height: 50px;
+  position: absolute;
+  left: 38px;
+  top: 510px;
+  right: 0px;
+  margin: auto;
+  transition: 300ms;
+}
+
+#parentMusic, #audio_button_play, #audio_button_delete {
+  width: 155px;
+  height: 25px;
+  float: left;
+  margin: auto;
+  padding: 5px;
+  background-color: rgb(150 250 150);
+  border: 5px double black;
+  transition: 250ms;
+}
+
+ #audio_button_delete:hover {
+  background-color: red;
+  color: black;
+ }
+
+ #audio_button_play:hover {
+  background-color: rgb(2, 45, 35);
+  color: black;
+ }
+
+input[type="range"] {
+  width: 150px;
+  height: 5px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: rgb(2, 45, 35);
+  border-radius: 2px;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background-color: rgb(70, 216, 165);
+  border-radius: 3px;
+  border: 1px solid rgb(2, 45, 35);
+  box-shadow: 0 0 5px rgb(150 250 150);
+}
+
+#audio_button_play, #audio_button_delete {
+  width: 45px;
+  height: 45px;
+  left: 567px;
+  color: rgb(2, 45, 35);
+  background-color: rgb(150 250 150);
+  cursor: pointer;
+  font-size: 1.2em;
+  border-radius: 10px;
+  border: 5px double black;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  text-indent: -1px;
+}
+
+#audio_button_delete {
+  left: 223px;
+  text-indent: 0px;
+  line-height: 28px;
+  border-radius: 0px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  letter-spacing: -1px;
+}
+
+#audio_button_play, #audio_button:hover, #parentMusic:hover {
+  opacity: 1;
+}
+
 
 .dinoV, .dinoH {
   position: absolute;
@@ -253,8 +368,7 @@ body {
 .dinoH { width: 63px; top: 440px }
 
 .box_dino_v {
-  opacity: 0.5;
-  width: 30px;
+  width: 40px;
   height: 50px;
   top: 420px;
   z-index: 3;

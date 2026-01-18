@@ -9,12 +9,21 @@
     <link rel="stylesheet" href="./styles.css">
   </head>
   <body>
-    <div id="game_block"></div>
-    <main>
-      <div id="snows"></div>
-      <div id="clouds"></div>
-      <div id="boxes"></div>
-      <div id="evils"></div>
+    <div id="details_game">
+      <div id="game_block"></div>
+      <form id="audio">
+        <button id="audio_button_delete" type="button">&#10006;</button>
+          <div id="parentMusic">
+            <input type="range" id="volume_audio" min="0" max="1" step="0.1" value="0.5">
+          </div>
+          <button id="audio_button_play" type="button">&#x2B07;</button>
+        </form>
+        <div id="snows"></div>
+        <div id="clouds"></div>
+        <div id="boxes"></div>
+        <div id="evils"></div>
+    </div>
+    <main>      
       <div id="window">
         <img src="./Animations/Window/homeWindow.gif" id="game">
         
@@ -29,29 +38,39 @@
           </div>
           <hr id="hrBottom">
           <div id="details">
-            <span>version: 1.1.1</span>
+            <span><- version: 1.1.5 -></span>
           </div>
         </div>
         
         <!-- settings -->
         <div id="screen_settings">
-           <div id="nameGame">settings</div>
-            <hr id="hrTop">
+           <div id="nameGame">Dino-edit</div>
+           
+           <div id="window_settings">
+            <!-- <table>
+              <tr class="table">
+                <th>
+                  <img src="./Animations/Menu/logotip.png" class="table_head">
+                </th>
+                <td class="table_body">Audio</td>
+                <td class="table_flag">On/off</td>
+              </tr>
+            </table> -->
+           </div>
 
-            <hr id="hrBottom">
             <div id="details">
-              <span id="back">Backing</span>
+              <span id="back">Backing -></span>
             </div>
         </div>
 
         <!-- shop -->
          <div id="screen_shop">
-            <div id="nameGame">shop</div>
-            <hr id="hrTop">
+            <div id="nameGame">Dino-shop</div>
+            
+            <div id="window_shop"></div>
 
-            <hr id="hrBottom">
             <div id="details">
-              <span id="back">Backing</span>
+              <span id="back"><- Backing</span>
             </div>
          </div>
 
@@ -65,9 +84,7 @@
           </div>
 
           <div id="time"><span id="timeScope">0</span> ms</div>
-          <div id="bonus_game">
-            
-          </div>
+          <div id="bonus_game"></div>
           
           <img src="./Animations/Dino/Dino.gif" id="dino" class="dinoV" alt="" data-Id="dino" style="display: none ">
           <div class="dinoV box_dino_v" id="box_dino" data-Id="dino"></div>
@@ -86,6 +103,8 @@
             <img src="./Animations/Menu/logotip.png" id="logo"><br>
             <span id="load">DINO2D</span>
           </div>
+          <div id="timeStorage"></div>
+          <div id="moneyStorage"></div>
 
           <div id="buttons">
           <img src="./Animations/Menu/new_play.png" id="new_game"><br>   
@@ -100,6 +119,6 @@
       </div>
     </main>
 
-    <script defer src="./scripts.js"></script>
+    <script src="./dinoController.js" type="module"></script>
   </body>
 </html>
