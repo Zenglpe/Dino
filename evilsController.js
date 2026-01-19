@@ -26,7 +26,7 @@ class Evils extends Details {
         }
 
         const createCactus = (srcName, id) => {
-            for(let urlEvil of Game.urls.get('cactuses').get(srcName)) {
+            for(let urlEvil of Game.urls.get(`cactuses_${srcName}`)) {
                 const cactus = createEvil(urlEvil, id, ['evil'])
                 cactus.classList.add(id)
             }
@@ -52,8 +52,8 @@ class Evils extends Details {
         }
 
         clouds: for(let l = 0, d = 0; l < 10; l++, d++) {
-            const cloudDark = createEvil(Game.urls.get('clouds').get('cloudDark'), 'cloud', ['clouds'])
-            const cloudLight = createEvil(Game.urls.get('clouds').get('cloudLight'), 'cloud', ['clouds'])
+            const cloudDark = createEvil(Game.urls.get('clouds_cloudDark'), 'cloud', ['clouds'])
+            const cloudLight = createEvil(Game.urls.get('clouds_cloudLight'), 'cloud', ['clouds'])
             
             const randomTop = (255 + Math.floor(Math.random() * 30)) + 'px';
 

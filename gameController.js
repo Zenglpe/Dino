@@ -15,15 +15,11 @@ class Game extends Events {
         ['health', './Animations/Health/health.gif'],
         ['money', './Animations/Bonuses/money.gif'],
         ['gift', './Animations/Bonuses/gift.gif'],
-        ['clouds', new Map([
-            ['cloudDark', './Animations/Clouds/Cloud/cloudDark.gif'],
-            ['cloudLight', './Animations/Clouds/Cloud/cloudLight.gif'],
-        ])],
-        ['cactuses', new Map([
-            [ 'one',  [ /* CACTUSES */ ]],
-            [ 'two',  [ /* CACTUSES */ ]],
-            ['three', [ /* CACTUSES */ ]],
-        ])],
+        ['clouds_cloudDark', './Animations/Clouds/Cloud/cloudDark.gif'],
+        ['clouds_cloudLight', './Animations/Clouds/Cloud/cloudLight.gif'],
+        ['cactuses_one', []],
+        ['cactuses_two', []],
+        ['cactuses_three', []],
         ['snow_green', './Animations/Menu/snow_green.png'],
         ['snow_red', './Animations/Menu/snow_red.png'],
     ])
@@ -31,7 +27,7 @@ class Game extends Events {
         super()
         for(let i = 1; i <= 21; i++) {
             let position = (i <= 8) ? 'one' : (i <= 17) ? 'two' : 'three';
-            Game.urls.get('cactuses').get(position).push(`./Animations/Cactuses/cactus${i}.gif`)
+            Game.urls.get(`cactuses_${position}`).push(`./Animations/Cactuses/cactus${i}.gif`)
         }
         this.onSnows()
     }

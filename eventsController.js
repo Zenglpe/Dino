@@ -18,11 +18,14 @@ class Events extends Music {
         this.#_dinoEvents()
     }
     #_detailsEvent() {
-        let money = 0;
-        let timeScope = 0;
-        const form = document.querySelector('form#audio')
-        const timeElement = document.querySelector('#timeScope')
-        const counter = document.querySelector('#counts');
+        let 
+          money = 0,
+          timeScope = 0;
+        const 
+          form = document.querySelector('form#audio'),
+          timeElement = document.querySelector('#timeScope'),
+          counter = document.querySelector('#counts'),
+          hp = document.querySelector('#health');
 
         document.addEventListener('detailstart', event => {
             const countsText = document.querySelector('#counts')
@@ -92,7 +95,6 @@ class Events extends Music {
         document.addEventListener('addhealth', event => {
             const count = event.detail;
             if(count < 0) return;
-            const hp = document.querySelector('#health');
             for(let i = 0; i < count; i++) {
                 if(hp.childElementCount >= 10) return;
                 const health = `<img class="hp" src="${Game.urls.get('health')}">`;
@@ -103,7 +105,6 @@ class Events extends Music {
         document.addEventListener('delhealth', event => {
             const v = event.detail;
             if(!Game.localStorage || v < 0) return;
-            const hp = document.querySelector('#health');
             for(let i = 0; i < v; i++) {
                 const length = hp.childElementCount;
                 if(length <= 0) return;
@@ -113,7 +114,6 @@ class Events extends Music {
             }
         })
         document.addEventListener('reloadhealth', event => {
-            const hp = document.querySelector('#health');
             const length = hp.childElementCount;
             if(length <= 0) this.pause()
         })
@@ -268,7 +268,7 @@ class Events extends Music {
             this.theme = (event.detail) ? 'dark' : 'light';
             for(let el of this.clouds.get('all')) {
                 const cloudTheme = (event.detail) ? 'cloudDark' : 'cloudLight';
-                el.src = Game.urls.get('clouds').get(cloudTheme)
+                el.src = Game.urls.get(`clouds_${cloudTheme}`)
             }
         })
         document.addEventListener('gamestart', event => {
